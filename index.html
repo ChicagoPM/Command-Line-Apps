@@ -458,10 +458,54 @@ Usage:
         perl -h|--help
 ```
 ---
+class: middle
+.center[
+# SHBANG!
+]
+```perl
+#!/usr/bin/env perl
+use feature qw( say );
+say "Hello, World!";
+```
+```
+$ ./hello.pl
+bash: permission denied: ./hello.pl
+$ chmod +x hello.pl
+$ ./hello.pl
+Hello, World!
+```
+---
+class: middle
+.center[
+# Basic Script Boilerplate
+]
+```perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+my %opt;
+GetOptions( \%opt,
+    'help|h',
+);
+pod2usage(0) if $opt{help};
+
+### Put your code here
+
+=head1 NAME
+=head1 SYNOPSIS
+=head1 ARGUMENTS
+=head1 OPTIONS
+=head1 EXIT CODES
+=head1 LICENSE AND COPYRIGHT
+```
+---
 
 template: title
 
 # Modulinos
+Scripts as Modules
 
 ---
 template: title
