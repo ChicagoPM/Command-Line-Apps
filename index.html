@@ -527,6 +527,149 @@ template: title
 Scripts as Modules
 
 ---
+class: center middle
+# Code Organization
+---
+class: center middle
+# Reusable Components
+---
+class: center middle
+# Testable Scripts
+---
+class: middle
+.center[
+# .code[int main(argv)]
+]
+```perl
+package modulino;
+sub main {
+    my ( $opt, $argv ) = @_;
+    ### Put your code here
+    return 0;
+}
+exit main( {}, \@ARGV );
+```
+```
+$ perl modulino.pm
+$ ./modulino.pm
+```
+---
+class: middle
+.center[
+# Add the options
+]
+```perl
+use Getopt::Long qw( GetOptionsFromArray );
+sub main {
+    my ( $opt, $argv ) = @_;
+    ### Put your code here
+    return 0;
+}
+my %opt;
+GetOptionsFromArray( \@ARGV, \%opt,
+    'help|h',
+);
+exit main( \%opt, \@ARGV );
+```
+---
+class: middle
+.center[
+# Use as a Module
+]
+```perl
+if ( !caller(0) ) {
+    my %opt;
+    GetOptionsFromArray( \@ARGV, \%opt,
+        'greeting:s',
+        'help|h',
+    );
+    exit main( \%opt, \@ARGV );
+}
+```
+---
+class: middle
+.center[
+# The Greeting Modulino
+]
+```perl
+#!/usr/bin/env perl
+package greet;
+use strict;
+use warnings;
+use feature qw( say );
+use Getopt::Long qw( GetOptionsFromArray );
+use Pod::Usage;
+
+sub main {
+    my ( $opt, $argv ) = @_;
+    pod2usage(0) if $opt->{help};
+    pod2usage("ERROR: Must give someone to greet") if !$argv->[0];
+    $opt->{greeting} ||= "Hello";
+    say "$opt->{greeting}, $argv->[0]!";
+    return 0;
+}
+
+if ( !caller(0) ) {
+    my %opt;
+    GetOptionsFromArray( \@ARGV, \%opt,
+        'greeting:s',
+        'help|h',
+    );
+    exit main( \%opt, \@ARGV );
+}
+
+1; # <module>.pm did not return a true value
+```
+---
+class: middle
+.center[
+# Run the Modulino
+]
+```
+$ perl greet.pm --greeting "Good Morning" "St. Louis"
+Good Morning, St. Louis!
+$ chmod +x greet.pm
+$ ./greet.pm Chicago.PM
+Hello, Chicago.PM
+```
+---
+class: middle
+.center[
+# Test the Modulino
+]
+```perl
+use Test::More;
+use Capture::Tiny qw( capture );
+use greet;
+my ( $stdout, $stderr, $exit ) = capture {
+    greet::main( {}, [ "Chicago.PM" ] );
+};
+is $stdout, "Hello, Chicago.PM!\n", 'correct greeting';
+is $exit, 0, 'exit code: success';
+done_testing;
+```
+```
+$ prove -v greet.t
+greet.t ..
+ok 1 - correct greeting
+ok 2 - exit code: success
+1..2
+ok
+All tests successful.
+Files=1, Tests=2,  0 wallclock secs (...)
+Result: PASS
+```
+---
+template: title
+
+# MooseX::Runnable
+Moose-based Modulino
+
+---
+template: title
+# App::Cmd
+Framework for large apps
+---
 template: title
 
 # What Next?
