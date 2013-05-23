@@ -660,11 +660,140 @@ Files=1, Tests=2,  0 wallclock secs (...)
 Result: PASS
 ```
 ---
+class: middle center
+# Add more methods
+.code[Sub::Exporter]
+---
+class: middle center
+# Inheritance
+---
+class: middle
+.center[
+# Modulino Boilerplate
+]
+```perl
+#!/usr/bin/env perl
+package modulino;
+use strict;
+use warnings;
+use Getopt::Long qw( GetOptionsFromArray );
+use Pod::Usage;
+
+sub main {
+    my ( $opt, $argv ) = @_;
+    pod2usage(0) if $opt->{help};
+    ### Your code here
+    return 0;
+}
+
+if ( !caller(0) ) {
+    my %opt;
+    GetOptionsFromArray( \@ARGV, \%opt,
+        ### Your options here
+        'help|h',
+    );
+    exit main( \%opt, \@ARGV );
+}
+
+1;
+
+=head1 NAME
+=head1 SYNOPSIS
+=head1 ARGUMENTS
+=head1 OPTIONS
+=head1 LICENSE AND COPYRIGHT
+```
+---
 template: title
 
 # MooseX::Runnable
 Moose-based Modulino
+---
+class: center middle
 
+# Existing Module
+.code[My::Module]
+---
+class: center middle
+# Runnable Modulino
+.code[mx-run My::Module]
+---
+class: middle
+.center[
+# Hello.pm
+]
+```perl
+package Runnable::Hello;
+use feature qw( say );
+use Moose;
+with 'MooseX::Runnable';
+sub run {
+    my ( $self ) = @_;
+    say "Hello, World!";
+    return 0;
+}
+1;
+```
+```
+$ mx-run -I. Runnable::Hello
+Hello, World!
+```
+---
+class: center middle
+# Run From Anywhere
+.code[@INC $ENV{PERL5LIB}]
+---
+class: middle
+.center[
+# Arguments
+]
+```perl
+package Runnable::Greet;
+use feature qw( say );
+use Moose;
+with 'MooseX::Runnable';
+sub run {
+    my ( $self, $who ) = @_;
+    say "Hello, $who!";
+    return 0;
+}
+1;
+```
+```
+$ mx-run -I. Runnable::Greet Chicago.PM
+Hello, Chicago.PM!
+```
+---
+class: middle
+.center[
+# Options
+.code[MooseX::Getopt]
+]
+```perl
+package Runnable::Greet;
+use feature qw( say );
+use Moose;
+with 'MooseX::Runnable', 'MooseX::Getopt';
+has greeting => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Hello',
+);
+sub run {
+    my ( $self, $who ) = @_;
+    say $self->greeting . ", $who!";
+    return 0;
+}
+1;
+```
+```
+$ mx-run -I. Runnable::Greet --greeting Bonjour Chicago.PM
+Bonjour, Chicago.PM!
+```
+---
+class: middle center
+# Caution: Two in One!
+Command-line and Object
 ---
 template: title
 # App::Cmd
