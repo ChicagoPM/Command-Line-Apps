@@ -216,6 +216,25 @@ Goodbye, Cleveland!
 ```
 ---
 class: middle
+.center[
+# Option Options
+]
+```perl
+use Getopt::Long;
+my %opt;
+GetOptions( \%opt,
+    'boolean',      # --boolean
+    'increment+',   # --increment --increment --increment
+    'toggle!',      # --toggle || --no-toggle
+    'required=s',   # --required "Value"
+    'optional:s',   # --optional "Value" || --optional
+    'multiple=s@',  # --multiple "Foo" --multiple "Bar"
+    'pairs=s%',     # --pairs foo=1 --pairs bar=1
+    'name|n',       # --name || -n
+);
+```
+---
+class: middle
 
 .center[
 # Standard Input
