@@ -794,11 +794,122 @@ Bonjour, Chicago.PM!
 class: middle center
 # Caution: Two in One!
 Command-line and Object
+
+---
+class: middle center
+# Attributes and Documentation overlap
+We're pragmatists, not purists
+
 ---
 template: title
 # App::Cmd
 Framework for large apps
 ---
+class: middle
+.center[
+## A digression
+]
+
+```
+$ git help
+usage: git [--version] [--exec-path[=<path>]] [--html-path] [--man-path] 
+           [--info-path]
+           [-p|--paginate|--no-pager] [--no-replace-objects] [--bare]
+           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]
+           [-c name=value] [--help]
+           <command> [<args>]
+
+The most commonly used git commands are:
+   add        Add file contents to the index
+   branch     List, create, or delete branches
+   checkout   Checkout a branch or paths to the working tree
+   clone      Clone a repository into a new directory
+   commit     Record changes to the repository
+   diff       Show changes between commits, commit and working tree, etc
+   init       Create an empty git repository or reinitialize an existing one
+   log        Show commit logs
+   merge      Join two or more development histories together
+   pull       Fetch from and merge with another repository or a local branch
+   push       Update remote refs along with associated objects
+   rebase     Forward-port local commits to the updated upstream head
+   reset      Reset current HEAD to the specified state
+   rm         Remove files from the working tree and from the index
+   status     Show the working tree status
+   tag        Create, list, delete or verify a tag object signed with GPG
+
+See 'git help <command>' for more information on a specific command.
+```
+---
+class: middle center
+# App::Cmd Framework
+Manages Complexity
+---
+class: middle center
+# Command Modules
+Each module, a command
+---
+class: middle
+.center[
+# 1: Application Module
+]
+The entry point
+```perl
+package App::Say;
+use App::Cmd::Setup -app;
+1;
+```
+---
+class: middle
+.center[
+# 2: Command Module
+]
+```perl
+package App::Say::Command::hello;
+use feature qw( say );
+use App::Cmd::Setup -command;
+sub execute {
+    my ( $self, $opt, $args ) = @_;
+    say "Hello, World!";
+    return 0;
+}
+1;
+```
+---
+class: middle
+.center[
+# 3: The Runner Script
+]
+```perl
+#!/usr/bin/env perl
+use App::Say;
+App::Say->run;
+```
+```
+$ perl -I. say.pl
+Hello, World!
+```
+---
+class: middle
+.center[
+# Arguments
+]
+```perl
+package App::Say::Command::greet;
+use feature qw( say );
+use App::Cmd::Setup -command;
+sub execute {
+    my ( $self, $opt, $args ) = @_;
+    say "Hello, $args->[0]";
+    return 0;
+};
+1;
+```
+```
+$ perl -I. say.pl greet Chicago.PM
+Hello, Chicago.PM
+```
+---
+
 template: title
 
 # What Next?
