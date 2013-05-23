@@ -3,7 +3,12 @@
   <head>
     <title>Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <script src="remark/remark.js" type="text/javascript">{"highlightStyle": "solarized_light"}</script>
+    <script src="remark/remark.js" type="text/javascript">
+        {
+            "highlightStyle": "solarized_light",
+            "highlightLanguage": "no-highlight"
+        }
+    </script>
     <style type="text/css" media="screen">
 /*
 SOLARIZED HEX     16/8 TERMCOL  XTERM/HEX   L*A*B      RGB         HSB
@@ -106,7 +111,7 @@ class: center, middle
 ---
 class: center, middle
 
-# Perl is elegant
+# Perl is an elegant solution
 for a more civilized age
 
 ---
@@ -141,11 +146,11 @@ template: title
 
 ---
 
-# Code Organization
+# User Documentation
 
 ---
 
-# User Documentation
+# Code Organization
 
 ---
 template: title
@@ -179,16 +184,296 @@ use feature qw( say );
 say "Hello, $ARGV[0]!";
 ```
 
-```sh
+```
 $ perl greet.pl Chicago
 Hello, Chicago!
 ```
 
 ---
+class: middle
+
+.center[
+# Options
+## .code[Getopt::Long]
+]
+
+```perl
+use feature qw( say );
+use Getopt::Long;
+my %opt = (
+    greeting => 'Hello',
+);
+GetOptions( \%opt,
+    'greeting:s',
+);
+say "$opt{greeting}, $ARGV[0]!";
+```
+```
+$ perl greet.pl Chicago
+Hello, Chicago!
+$ perl greet.pl --greeting Goodbye Cleveland
+Goodbye, Cleveland!
+```
+---
+class: middle
+
+.center[
+# Standard Input
+]
+```perl
+use feature qw( say );
+for my $line ( <STDIN> ) {
+    my @emails = ( $line =~ /(\S+[@]\S+)/g );
+    say for @emails;
+}
+```
+```
+$ perl find_emails.pl < /var/spool/mail/victim
+flannel@selfies.com
+shabby@chic.com
+Wes@Anderson.com
+batch@Godard.org
+trust@fund.org
+```
+
+---
+class: middle
+
+.center[
+# Standard Output
+]
+```perl
+use feature qw( say );
+say 'Hello, World!';
+```
+```
+$ perl hello.pl
+Hello, World!
+```
+
+---
+class: middle
+
+.center[
+# Standard Error
+]
+```perl
+use warnings;
+warn "Look out, World!"
+die "I'm going down!\n"
+```
+```
+$ perl warn.pl
+Look out, World! at warn.pl line 2.
+I'm going down!
+```
+
+---
+class: middle
+.center[
+# STDOUT vs STDERR
+]
+```perl
+use warnings;
+use feature qw( say );
+say "Hello, World!"
+warn "Look out, World!"
+die "I'm going down!\n"
+```
+```
+$ perl stdouterr.pl 1>stdout.txt 2>stderr.txt
+$ cat stdout.txt
+Hello, World!
+$ cat stderr.txt
+Look out, World! at stdouterr.pl line 4.
+I'm going down!
+```
+---
+class: middle
+.center[
+# Exit Status
+]
+```
+$ perl hello.pl
+Hello, World!
+$ echo $?
+0
+$ perl warn.pl
+Look out, World! at warn.pl line 2.
+I'm going down!
+$ echo $?
+255
+```
+---
+class: middle
+.center[
+# 0 is good
+Everything else is bad
+]
+```
+$ perl hello.pl && perl warn.pl
+Hello, World!
+Look out, World! at warn.pl line 2.
+I'm going down!
+
+$ perl warn.pl && perl hello.pl
+Look out, World! at warn.pl line 2.
+I'm going down!
+```
+---
+class: middle
+.center[
+# Choose your exit
+]
+```perl
+use feature qw( say );
+say "Exit code $ARGV[0]";
+exit $ARGV[0];
+```
+```
+$ perl exit.pl 0
+Exit code 0
+
+$ echo $?
+0
+
+$ perl exit.pl 1
+Exit code 1
+
+$ echo $?
+1
+```
+---
+class: center middle
+
+# User Documentation
+Pod::Usage
+
+---
+class: middle
+
+.center[
+# Plain Old Documentation
+]
+```
+=head1 NAME
+
+greet.pl - Say hello!
+
+=head1 SYNOPSIS
+
+    perl greet.pl [--greeting <greeting>] <who>
+
+=head1 ARGUMENTS
+
+=head2 who
+
+Who to greet. Defaults to "World"
+
+=head1 OPTIONS
+
+=head2 greeting
+
+The greeting to use. Defaults to "Hello"
+```
+---
+class: middle
+.center[
+# Read The Fine Manual
+]
+```
+$ perldoc greet.pl
+GREET(1)       User Contributed Perl Documentation      GREET(1)
+
+NAME
+       greet.pl - Say hello!
+
+SYNOPSIS
+           perl greet.pl [--greeting <greeting>] [<who>]
+
+ARGUMENTS
+   who
+       Who to greet. Defaults to "World".
+
+OPTIONS
+   greeting
+       The greeting to use. Defaults to "Hello".
+
+perl v5.14.2              2013-05-23                  GREET(1)
+```
+
+---
+class: middle
+.center[
+# Help the User
+Give them a `-h`and
+]
+```perl
+use Getopt::Long;
+use Pod::Usage;
+my %opt;
+GetOptions( \%opt,
+    'help|h',
+);
+pod2usage(0) if $opt{help};
+```
+```
+$ perl greet.pl -h
+Usage:
+        perl greet.pl [--greeting <greeting>] [<who>]
+        perl -h|--help
+
+Arguments:
+  who:
+    Who to greet. Defaults to "World".
+
+Options:
+  greeting:
+    The greeting to use. Defaults to "Hello".
+
+  help|h:
+    Display help and usage
+```
+---
+class: middle
+.center[
+# Scold the User
+Tell them what they did wrong
+]
+```perl
+use Getopt::Long;
+use Pod::Usage;
+my %opt;
+GetOptions( \%opt,
+    'help|h',
+);
+pod2usage(0) if $opt{help};
+pod2usage("ERROR: Must give someone to greet") if !$ARGV[0];
+```
+```
+$ perl greet.pl
+ERROR: Must give someone to greet
+Usage:
+        perl greet.pl [--greeting <greeting>] [<who>]
+        perl -h|--help
+```
+---
+
 template: title
 
 # Modulinos
 
+---
+template: title
+
+# What Next?
+
+---
+
+# .code[system() exec() qx()]
+## .code[$?] in .code[perldoc perlvar]
+
+---
     </textarea>
     <div id="slideshow"></div>
   </body>
