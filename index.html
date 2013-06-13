@@ -258,7 +258,23 @@ Wes@Anderson.com
 batch@Godard.org
 trust@fund.org
 ```
-
+---
+class: middle
+.center[
+# The Diamond Operator `<>`
+Filenames in @ARGV, otherwise STDIN
+]
+```perl
+use feature qw( say );
+while ( my $line = <> ) {
+    my @emails = ( $line =~ /(\S+[@]\S+)/g );
+    say for @emails;
+}
+```
+```
+$ perl find_emails.pl < /var/spool/mail/victim
+$ perl find_emails.pl /var/spool/mail/victim
+```
 ---
 class: middle
 
