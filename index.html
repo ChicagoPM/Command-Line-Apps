@@ -541,11 +541,11 @@ class: middle
 ```perl
 package modulino;
 sub main {
-    my ( $opt, $argv ) = @_;
+    my ( $argv ) = @_;
     ### Put your code here
     return 0;
 }
-exit main( {}, \@ARGV );
+exit main( \@ARGV );
 ```
 ```
 $ perl modulino.pm
@@ -559,15 +559,15 @@ class: middle
 ```perl
 use Getopt::Long qw( GetOptionsFromArray );
 sub main {
-    my ( $opt, $argv ) = @_;
+    my ( $argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( $argv, \%opt,
+        'help|h',
+    );
     ### Put your code here
     return 0;
 }
-my %opt;
-GetOptionsFromArray( \@ARGV, \%opt,
-    'help|h',
-);
-exit main( \%opt, \@ARGV );
+exit main( \@ARGV );
 ```
 ---
 class: middle
@@ -575,14 +575,7 @@ class: middle
 # Use as a Module
 ]
 ```perl
-if ( !caller(0) ) {
-    my %opt;
-    GetOptionsFromArray( \@ARGV, \%opt,
-        'greeting:s',
-        'help|h',
-    );
-    exit main( \%opt, \@ARGV );
-}
+exit main( \@ARGV ) if !caller(0);
 ```
 ---
 class: middle
@@ -599,22 +592,20 @@ use Getopt::Long qw( GetOptionsFromArray );
 use Pod::Usage;
 
 sub main {
-    my ( $opt, $argv ) = @_;
-    pod2usage(0) if $opt->{help};
-    pod2usage("ERROR: Must give someone to greet") if !@{$argv};
-    $opt->{greeting} ||= "Hello";
-    say "$opt->{greeting}, $argv->[0]!";
-    return 0;
-}
-
-if ( !caller(0) ) {
+    my ( $argv ) = @_;
     my %opt;
-    GetOptionsFromArray( \@ARGV, \%opt,
+    GetOptionsFromArray( $argv, \%opt,
         'greeting:s',
         'help|h',
     );
-    exit main( \%opt, \@ARGV );
+    pod2usage(0) if $opt{help};
+    pod2usage("ERROR: Must give someone to greet") if !@{$argv};
+    $opt{greeting} ||= "Hello";
+    say "$opt{greeting}, $argv->[0]!";
+    return 0;
 }
+
+exit main( \@ARGV ) if !caller(0);
 
 1; # <module>.pm did not return a true value
 ```
@@ -640,7 +631,7 @@ use Test::More;
 use Capture::Tiny qw( capture );
 use greet;
 my ( $stdout, $stderr, $exit ) = capture {
-    greet::main( {}, [ "Chicago.PM" ] );
+    greet::main( [ "Chicago.PM" ] );
 };
 is $stdout, "Hello, Chicago.PM!\n", 'correct greeting';
 is $exit, 0, 'exit code: success';
@@ -678,20 +669,18 @@ use Getopt::Long qw( GetOptionsFromArray );
 use Pod::Usage;
 
 sub main {
-    my ( $opt, $argv ) = @_;
-    pod2usage(0) if $opt->{help};
+    my ( $argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( $argv, \%opt,
+        ### Your options here
+        'help|h',
+    );
+    pod2usage(0) if $opt{help};
     ### Your code here
     return 0;
 }
 
-if ( !caller(0) ) {
-    my %opt;
-    GetOptionsFromArray( \@ARGV, \%opt,
-        ### Your options here
-        'help|h',
-    );
-    exit main( \%opt, \@ARGV );
-}
+exit main( \@ARGV ) if ( !caller(0) );
 
 1;
 
