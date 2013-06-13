@@ -733,7 +733,7 @@ sub run {
 1;
 ```
 ```
-$ mx-run -I. Runnable::Hello
+$ mx-run Runnable::Hello
 Hello, World!
 ```
 ---
@@ -758,7 +758,7 @@ sub run {
 1;
 ```
 ```
-$ mx-run -I. Runnable::Greet Chicago.PM
+$ mx-run Runnable::Greet Chicago.PM
 Hello, Chicago.PM!
 ```
 ---
@@ -785,7 +785,7 @@ sub run {
 1;
 ```
 ```
-$ mx-run -I. Runnable::Greet --greeting Bonjour Chicago.PM
+$ mx-run Runnable::Greet --greeting Bonjour Chicago.PM
 Bonjour, Chicago.PM!
 ```
 ---
@@ -883,7 +883,7 @@ use App::Say;
 App::Say->run;
 ```
 ```
-$ perl -I. say.pl
+$ perl say.pl
 Hello, World!
 ```
 ---
@@ -903,7 +903,7 @@ sub execute {
 1;
 ```
 ```
-$ perl -I. say.pl greet Chicago.PM
+$ perl say.pl greet Chicago.PM
 Hello, Chicago.PM
 ```
 ---
@@ -929,7 +929,7 @@ sub execute {
 1;
 ```
 ```
-$ perl -I. say.pl greet --greeting Bonjour Chicago.PM
+$ perl say.pl greet --greeting Bonjour Chicago.PM
 Bonjour, Chicago.PM
 ```
 ---
