@@ -241,7 +241,7 @@ class: middle
 ]
 ```perl
 use feature qw( say );
-for my $line ( <STDIN> ) {
+while ( my $line = <STDIN> ) {
     my @emails = ( $line =~ /(\S+[@]\S+)/g );
     say for @emails;
 }
