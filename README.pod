@@ -1,0 +1,81 @@
+
+=head1 NAME
+
+Building Command-line Applications with Perl
+
+=head1 VERSION
+
+1.1 (2013-06-13)
+
+=head1 DESCRIPTION
+
+This talk is about command-line applications.
+
+It starts out with some of the basic core modules for building
+command-line applications that most people should be familiar with.
+
+From there, it introduces some modern techniques and CPAN modules
+that help build modular, maintainable command-line applications.
+
+=head1 RUNNING TIME
+
+Approximately 90 minutes. 
+
+Can be split into two sections, "core" and "CPAN modules".
+
+=head1 TOPICS COVERED
+
+=over 4
+
+=item STDIN, STDOUT, STDERR
+
+=item Getopt::Long
+
+=item Pod::Usage
+
+=item Modulinos
+
+=item MooseX::Runnable
+
+=item MooseX::Getopt
+
+=item App::Cmd
+
+=back
+
+=head1 PREREQUISITES
+
+=over 4
+
+=item Basic knowledge of Perl
+
+One of the community-approved beginner books will work splendidly.
+
+=item Modern Perl
+
+=over 4
+
+=item Moose
+
+One section of this talk involves a Moose-based module.
+
+=back
+
+=item Basic command-line knowledge
+
+How to open a command-line. How to run a Perl program from the command-line.
+
+=back
+
+=head1 AUTHORS
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT
+
+(c) 2013 Doug Bell
+
+=head1 LICENSE
+
+This presentation and associated code is licensed under the same terms as Perl
+itself (Artistic License 1.0 or GPL 1.0 at your discretion).
