@@ -753,6 +753,28 @@ Hello, Chicago.PM!
 ---
 class: middle
 .center[
+# Show usage instructions
+]
+```perl
+sub run {
+    my ( $self, $who ) = @_;
+    die "Must give someone to greet!\n\n" . $self->usage unless $who;
+    say "Hello, $who!";
+    return 0;
+}
+1;
+```
+```
+$ mx-run Runnable::Greet
+Must give someone to greet!
+
+usage: mx-run [-?h] [long options...]
+        -h -? --usage --help  Prints this usage information.
+        --greeting
+```
+---
+class: middle
+.center[
 # Options
 .code[MooseX::Getopt]
 ]
@@ -768,6 +790,7 @@ has greeting => (
 );
 sub run {
     my ( $self, $who ) = @_;
+    die "Must give someone to greet!\n\n" . $self->usage unless $who;
     say $self->greeting . ", $who!";
     return 0;
 }
@@ -780,7 +803,20 @@ Bonjour, Chicago.PM!
 ---
 class: middle center
 # Caution: Two in One!
-Command-line and Object
+Command-line and Object APIs can conflict
+
+---
+class: middle
+.center[
+# Avoiding Conflict
+`MooseX::Getopt` ignores _attr and NoGetopt attributes
+]
+```perl
+has _private => ( ... ); # cannot be set from command-line
+has more_private => (
+    traits => [qw( NoGetopt )],
+);
+```
 
 ---
 class: middle center
