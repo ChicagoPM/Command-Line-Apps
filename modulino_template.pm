@@ -17,9 +17,7 @@ sub main {
     return 0;
 }
 
-if ( !caller(0) ) {
-    exit main( \@ARGV );
-}
+exit main( \@ARGV ) unless caller(0);
 
 1;
 
