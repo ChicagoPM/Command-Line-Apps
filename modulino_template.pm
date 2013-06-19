@@ -8,7 +8,7 @@ use Pod::Usage;
 sub main {
     my ( $argv ) = @_;
     my %opt;
-    GetOptionsFromArray( \@ARGV, \%opt,
+    GetOptionsFromArray( $argv, \%opt,
         ### Your options here
         'help|h',
     );
