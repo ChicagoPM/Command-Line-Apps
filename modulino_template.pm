@@ -6,19 +6,19 @@ use Getopt::Long qw( GetOptionsFromArray );
 use Pod::Usage;
 
 sub main {
-    my ( $opt, $argv ) = @_;
-    pod2usage(0) if $opt->{help};
-    ### Your code here
-    return 0;
-}
-
-if ( !caller(0) ) {
+    my ( $argv ) = @_;
     my %opt;
     GetOptionsFromArray( \@ARGV, \%opt,
         ### Your options here
         'help|h',
     );
-    exit main( \%opt, \@ARGV );
+    pod2usage(0) if $opt{help};
+    ### Your code here
+    return 0;
+}
+
+if ( !caller(0) ) {
+    exit main( \@ARGV );
 }
 
 1;
