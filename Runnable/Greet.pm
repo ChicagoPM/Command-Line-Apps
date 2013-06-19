@@ -9,6 +9,7 @@ has greeting => (
 );
 sub run {
     my ( $self, $who ) = @_;
+    die "Must give someone to greet!\n\n" . $self->usage unless $who;
     say $self->greeting . ", $who!";
     return 0;
 }

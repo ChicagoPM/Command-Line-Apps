@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>Building Command-line Applications in Perl</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <script src="remark/remark.js" type="text/javascript">
         {
@@ -234,6 +234,10 @@ GetOptions( \%opt,
 );
 ```
 ---
+class: center middle
+# GetOptions edits @ARGV
+Leaves what it doesn't know about: your arguments
+---
 class: middle
 
 .center[
@@ -241,7 +245,7 @@ class: middle
 ]
 ```perl
 use feature qw( say );
-for my $line ( <STDIN> ) {
+while ( my $line = <STDIN> ) {
     my @emails = ( $line =~ /(\S+[@]\S+)/g );
     say for @emails;
 }
@@ -254,7 +258,23 @@ Wes@Anderson.com
 batch@Godard.org
 trust@fund.org
 ```
-
+---
+class: middle
+.center[
+# The Diamond Operator `<>`
+Filenames in @ARGV, otherwise STDIN
+]
+```perl
+use feature qw( say );
+while ( my $line = <> ) {
+    my @emails = ( $line =~ /(\S+[@]\S+)/g );
+    say for @emails;
+}
+```
+```
+$ perl find_emails.pl < /var/spool/mail/victim
+$ perl find_emails.pl /var/spool/mail/victim
+```
 ---
 class: middle
 
@@ -277,7 +297,6 @@ class: middle
 # Standard Error
 ]
 ```perl
-use warnings;
 warn "Look out, World!"
 die "I'm going down!\n"
 ```
@@ -293,7 +312,6 @@ class: middle
 # STDOUT vs STDERR
 ]
 ```perl
-use warnings;
 use feature qw( say );
 say "Hello, World!"
 warn "Look out, World!"
@@ -467,7 +485,7 @@ GetOptions( \%opt,
     'help|h',
 );
 pod2usage(0) if $opt{help};
-pod2usage("ERROR: Must give someone to greet") if !$ARGV[0];
+pod2usage("ERROR: Must give someone to greet") if !@ARGV;
 ```
 ```
 $ perl greet.pl
@@ -543,11 +561,11 @@ class: middle
 ```perl
 package modulino;
 sub main {
-    my ( $opt, $argv ) = @_;
+    my ( $argv ) = @_;
     ### Put your code here
     return 0;
 }
-exit main( {}, \@ARGV );
+exit main( \@ARGV );
 ```
 ```
 $ perl modulino.pm
@@ -561,15 +579,15 @@ class: middle
 ```perl
 use Getopt::Long qw( GetOptionsFromArray );
 sub main {
-    my ( $opt, $argv ) = @_;
+    my ( $argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( $argv, \%opt,
+        'help|h',
+    );
     ### Put your code here
     return 0;
 }
-my %opt;
-GetOptionsFromArray( \@ARGV, \%opt,
-    'help|h',
-);
-exit main( \%opt, \@ARGV );
+exit main( \@ARGV );
 ```
 ---
 class: middle
@@ -577,14 +595,7 @@ class: middle
 # Use as a Module
 ]
 ```perl
-if ( !caller(0) ) {
-    my %opt;
-    GetOptionsFromArray( \@ARGV, \%opt,
-        'greeting:s',
-        'help|h',
-    );
-    exit main( \%opt, \@ARGV );
-}
+exit main( \@ARGV ) if !caller(0);
 ```
 ---
 class: middle
@@ -601,22 +612,20 @@ use Getopt::Long qw( GetOptionsFromArray );
 use Pod::Usage;
 
 sub main {
-    my ( $opt, $argv ) = @_;
-    pod2usage(0) if $opt->{help};
-    pod2usage("ERROR: Must give someone to greet") if !$argv->[0];
-    $opt->{greeting} ||= "Hello";
-    say "$opt->{greeting}, $argv->[0]!";
-    return 0;
-}
-
-if ( !caller(0) ) {
+    my ( $argv ) = @_;
     my %opt;
-    GetOptionsFromArray( \@ARGV, \%opt,
+    GetOptionsFromArray( $argv, \%opt,
         'greeting:s',
         'help|h',
     );
-    exit main( \%opt, \@ARGV );
+    pod2usage(0) if $opt{help};
+    pod2usage("ERROR: Must give someone to greet") if !@{$argv};
+    $opt{greeting} ||= "Hello";
+    say "$opt{greeting}, $argv->[0]!";
+    return 0;
 }
+
+exit main( \@ARGV ) if !caller(0);
 
 1; # <module>.pm did not return a true value
 ```
@@ -642,7 +651,7 @@ use Test::More;
 use Capture::Tiny qw( capture );
 use greet;
 my ( $stdout, $stderr, $exit ) = capture {
-    greet::main( {}, [ "Chicago.PM" ] );
+    greet::main( [ "Chicago.PM" ] );
 };
 is $stdout, "Hello, Chicago.PM!\n", 'correct greeting';
 is $exit, 0, 'exit code: success';
@@ -680,20 +689,18 @@ use Getopt::Long qw( GetOptionsFromArray );
 use Pod::Usage;
 
 sub main {
-    my ( $opt, $argv ) = @_;
-    pod2usage(0) if $opt->{help};
+    my ( $argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( $argv, \%opt,
+        ### Your options here
+        'help|h',
+    );
+    pod2usage(0) if $opt{help};
     ### Your code here
     return 0;
 }
 
-if ( !caller(0) ) {
-    my %opt;
-    GetOptionsFromArray( \@ARGV, \%opt,
-        ### Your options here
-        'help|h',
-    );
-    exit main( \%opt, \@ARGV );
-}
+exit main( \@ARGV ) if ( !caller(0) );
 
 1;
 
@@ -735,7 +742,7 @@ sub run {
 1;
 ```
 ```
-$ mx-run -I. Runnable::Hello
+$ mx-run Runnable::Hello
 Hello, World!
 ```
 ---
@@ -760,8 +767,30 @@ sub run {
 1;
 ```
 ```
-$ mx-run -I. Runnable::Greet Chicago.PM
+$ mx-run Runnable::Greet Chicago.PM
 Hello, Chicago.PM!
+```
+---
+class: middle
+.center[
+# Show usage instructions
+]
+```perl
+sub run {
+    my ( $self, $who ) = @_;
+    die "Must give someone to greet!\n\n" . $self->usage unless $who;
+    say "Hello, $who!";
+    return 0;
+}
+1;
+```
+```
+$ mx-run Runnable::Greet
+Must give someone to greet!
+
+usage: mx-run [-?h] [long options...]
+        -h -? --usage --help  Prints this usage information.
+        --greeting
 ```
 ---
 class: middle
@@ -781,19 +810,33 @@ has greeting => (
 );
 sub run {
     my ( $self, $who ) = @_;
+    die "Must give someone to greet!\n\n" . $self->usage unless $who;
     say $self->greeting . ", $who!";
     return 0;
 }
 1;
 ```
 ```
-$ mx-run -I. Runnable::Greet --greeting Bonjour Chicago.PM
+$ mx-run Runnable::Greet --greeting Bonjour Chicago.PM
 Bonjour, Chicago.PM!
 ```
 ---
 class: middle center
 # Caution: Two in One!
-Command-line and Object
+Command-line and Object APIs can conflict
+
+---
+class: middle
+.center[
+# Avoiding Conflict
+`MooseX::Getopt` ignores _attr and NoGetopt attributes
+]
+```perl
+has _private => ( ... ); # cannot be set from command-line
+has more_private => (
+    traits => [qw( NoGetopt )],
+);
+```
 
 ---
 class: middle center
@@ -885,7 +928,7 @@ use App::Say;
 App::Say->run;
 ```
 ```
-$ perl -I. say.pl
+$ perl say.pl hello
 Hello, World!
 ```
 ---
@@ -905,7 +948,7 @@ sub execute {
 1;
 ```
 ```
-$ perl -I. say.pl greet Chicago.PM
+$ perl say.pl greet Chicago.PM
 Hello, Chicago.PM
 ```
 ---
@@ -931,7 +974,7 @@ sub execute {
 1;
 ```
 ```
-$ perl -I. say.pl greet --greeting Bonjour Chicago.PM
+$ perl say.pl greet --greeting Bonjour Chicago.PM
 Bonjour, Chicago.PM
 ```
 ---
@@ -941,11 +984,32 @@ template: title
 # What Next?
 
 ---
+class: center middle
+
+# Read The Fine Manual
+
+&bull; Getopt::Long
+
+&bull; Pod::Usage
+
+&bull; MooseX::Runnable
+
+&bull; MooseX::Getopt
+
+&bull; Capture::Tiny
+
+&bull; App::Cmd
+
+---
+class: center middle
 
 # .code[system() exec() qx()]
 ## .code[$?] in .code[perldoc perlvar]
 
 ---
+template: title
+
+Thank You
     </textarea>
     <div id="slideshow"></div>
   </body>
